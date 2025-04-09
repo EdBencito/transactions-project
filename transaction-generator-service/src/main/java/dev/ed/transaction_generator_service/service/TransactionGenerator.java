@@ -14,7 +14,6 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 public class TransactionGenerator {
 
-    private final Random random = new Random();
     private final ObjectMapper objectMapper = new ObjectMapper(); // For JSON serialization
 
     @SneakyThrows
@@ -25,7 +24,7 @@ public class TransactionGenerator {
                 .timestamp(LocalDateTime.from(Instant.now()))
                 .transactionType(Transaction.TransactionType.getRandomType())
                 .amount(generateAmountBasedOnProfile(getRandomProfile()))
-                .currency(getRandomCurrency())
+                .currency("GBP")
                 .merchantCategory(Transaction.MerchantCategory.getRandomCategory())
                 .deviceInfo(Transaction.DeviceInfo.getRandomInfo())
                 .ipAddress(generateRandomIpAddress())
@@ -46,7 +45,7 @@ public class TransactionGenerator {
                 .timestamp(LocalDateTime.from(Instant.now()))
                 .transactionType(Transaction.TransactionType.PURCHASE)
                 .amount(generateAmountBasedOnProfile("HIGH_SPENDER"))
-                .currency(getRandomCurrency())
+                .currency("GBP")
                 .merchantCategory(Transaction.MerchantCategory.getRandomFraudulentCategory())
                 .deviceInfo(Transaction.DeviceInfo.getRandomFraudulentInfo())
                 .ipAddress(generateRandomIpAddress())
@@ -68,11 +67,11 @@ public class TransactionGenerator {
 
     private BigDecimal generateAmountBasedOnProfile(String profile) {
         if ("HIGH_SPENDER".equals(profile)) {
-            return BigDecimal.valueOf(100 + ThreadLocalRandom.current().nextDouble() * 1000); // Higher amounts
+            return BigDecimal.valueOf(100 + ThreadLocalRandom.current().nextDouble() * 500); // Higher amounts
         } else if ("MEDIUM_SPENDER".equals(profile)) {
-            return BigDecimal.valueOf(50 + ThreadLocalRandom.current().nextDouble() * 1000); // Medium amounts
+            return BigDecimal.valueOf(50 + ThreadLocalRandom.current().nextDouble() * 100); // Medium amounts
         } else { // "LOW_SPENDER" or default
-            return BigDecimal.valueOf(10 + ThreadLocalRandom.current().nextDouble() * 1000); // Lower amounts
+            return BigDecimal.valueOf(10 + ThreadLocalRandom.current().nextDouble() * 10); // Lower amounts
         }
     }
 

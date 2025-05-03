@@ -1,8 +1,10 @@
-package dev.ed.account_service.service;
+package dev.ed.account_service.helper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.ed.account_service.exception.MaxRetriesException;
 import dev.ed.account_service.model.Account;
+import dev.ed.account_service.repository.AccountRepository;
 import lombok.SneakyThrows;
+import net.datafaker.Faker;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -12,31 +14,55 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class AccountGenerator {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final AccountRepository accountRepository;
+    private final static Random random = new Random();
+
+    public AccountGenerator(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
+    }
+
 
     @SneakyThrows
-    public String generateAccount(String accountHolderName) {
+    public void generateAccount() {
         Account account = Account.builder()
                 .accountId(generateUUID())
                 .accountNumber(generateAccountNumber())
                 .accountType(Account.AccountType.getRandomAccountType())
                 .accountStatus(Account.AccountStatus.ACTIVE)
-                .accountHolderName(accountHolderName)
+                .accountHolderName(generateRandomName())
                 .openingDate(generateOpeningDate())
-                .currency("GBP")
+                .currency(random.nextBoolean() ? "USD" : "GBP")
                 .balance(generateBalance())
                 .interestRate(BigDecimal.valueOf(4.5))
                 .creditLimit(BigDecimal.valueOf(4000))
                 .build();
-        return objectMapper.writeValueAsString(account);
+        accountRepository.save(account);
     }
 
-    private UUID generateUUID() {
-        return UUID.randomUUID();
+    public String generateAccountNumber() {
+        int maxRetries = 5;
+        int retryCount = 0;
+        String accountNumber;
+        do {
+            accountNumber = String.valueOf(ThreadLocalRandom.current().nextLong(10_000_000_000L, 100_000_000_000L));
+            retryCount++;
+        } while (accountRepository.existsByAccountNumber(accountNumber) && retryCount < maxRetries); // Retry if exists
+        if (retryCount == maxRetries)
+            throw new MaxRetriesException("Max Retries for accountNumber generation has been hit");
+        return accountNumber;
     }
 
-    private String generateAccountNumber() {
-        return String.valueOf(ThreadLocalRandom.current().nextLong(10_000_000_000L, 100_000_000_000L));
+    public UUID generateUUID() {
+        int maxRetries = 5;
+        int retryCount = 0;
+        UUID accountId;
+        do {
+            accountId = UUID.randomUUID();
+            retryCount++;
+        } while (accountRepository.existsById(accountId) && retryCount < maxRetries);
+        if (retryCount == maxRetries)
+            throw new MaxRetriesException("Max Retries for accountId generation has been hit");// Retry if exists
+        return accountId;
     }
 
     private LocalDate generateOpeningDate() {
@@ -45,7 +71,7 @@ public class AccountGenerator {
                 LocalDate.now().toEpochDay()));
     }
 
-    public static String getRandomCurrency() {
+    private static String getRandomCurrency() {
         Set<Currency> currencyCodes = new HashSet<>();
         Locale[] locales = Locale.getAvailableLocales();
 
@@ -71,7 +97,12 @@ public class AccountGenerator {
         return iterator.next().toString(); // Return the element at the random index.
     }
 
-    public static BigDecimal generateBalance() {
+    private static BigDecimal generateBalance() {
         return BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(1000.0, 16000.0));
+    }
+
+    private String generateRandomName() {
+        Faker faker = new Faker();
+        return faker.name().fullName();
     }
 }

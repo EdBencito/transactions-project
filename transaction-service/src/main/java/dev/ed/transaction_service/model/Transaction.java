@@ -1,7 +1,9 @@
-package dev.ed.transaction_generator_service.model;
+package dev.ed.transaction_service.model;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,77 +14,64 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-
+@Entity
+@Table(name = "transactions", schema = "transaction_service_schema")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class Transaction {
+//    @ManyToOne
+//    @JoinColumn(name = "account_id", referencedColumnName = "accountId")
+//    private Account account;
+
+    @Id
+    @Column(name = "transaction_id", nullable = false, unique = true)
     private UUID transactionId;
 
-    @NotBlank(message = "accountId is required")
-    private String accountId;
+    @Column(name = "account_id", nullable = false)
+    private UUID accountId;
 
-    private LocalDateTime timestamp;
+    @Column(name = "transaction_status", nullable = false)
+    @NotNull(message = "transactionStatus is required")
+    @Enumerated(EnumType.STRING)
+    private TransactionStatus transactionStatus;
 
+    @Column(name = "creation_date_time", nullable = false)
+    @NotNull(message = "creationDateTime is required")
+    private LocalDateTime creationDateTime;
+
+    @Column(name = "last_updated", nullable = false)
+    @NotNull(message = "lastUpdated is required")
+    private LocalDateTime lastUpdated;
+
+    @Column(name = "transaction_type", nullable = false)
     @NotNull(message = "transactionType is required")
+    @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
 
+    @Column(name = "amount", nullable = false)
     @NotNull(message = "amount is required")
     private BigDecimal amount;
 
+    @Column(name = "currency", nullable = false)
     @NotBlank(message = "currency is required")
     private String currency;
 
-    @NotBlank(message = "merchantCategory is required")
+    @Column(name = "merchant_category", nullable = false)
+    @NotNull(message = "merchantCategory is required")
+    @Enumerated(EnumType.STRING)
     private MerchantCategory merchantCategory;
 
-    private MerchantLocation merchantLocation;
-
-    private DeviceInfo deviceInfo;
-
-    private String ipAddress;
-
+    @Column(name = "transaction_channel", nullable = false)
     @NotNull(message = "transactionChannel is required")
+    @Enumerated(EnumType.STRING)
     private TransactionChannel transactionChannel;
 
+    @Column(name = "is_fraudulent", nullable = false)
     private boolean isFraudulent;
 
-    // Enums and Inner Classes
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class MerchantLocation {
-        private String city;
-        private String country;
-
-//        @Override
-//        public String toString() {
-//            return "MerchantLocation{" +
-//                    "city='" + city + '\'' +
-//                    ", country='" + country + '\'' +
-//                    '}';
-//        }
-    }
-
-    public enum DeviceInfo {
-        ROOTED_DEVICE,
-        EMULATOR,
-        WEB_BROWSER,
-        MOBILE_APP,
-        ATM,
-        POS_TERMINAL;
-
-        public static DeviceInfo getRandomInfo() {
-            DeviceInfo[] values = DeviceInfo.values();
-            return values[ThreadLocalRandom.current().nextInt(values().length)];
-        }
-
-        public static DeviceInfo getRandomFraudulentInfo() {
-            DeviceInfo[] values = {MOBILE_APP,EMULATOR,WEB_BROWSER,ROOTED_DEVICE,};
-            return values[ThreadLocalRandom.current().nextInt(values().length)];
-        }
-    }
 
     public enum MerchantCategory {
         GAMBLING,
@@ -105,7 +94,7 @@ public class Transaction {
         }
 
         public static MerchantCategory getRandomFraudulentCategory() {
-            MerchantCategory[] values = {GAMBLING,ADULT_SERVICES,CRYPTOCURRENCY};
+            MerchantCategory[] values = {GAMBLING, ADULT_SERVICES, CRYPTOCURRENCY};
             return values[ThreadLocalRandom.current().nextInt(values().length)];
         }
     }
@@ -139,26 +128,24 @@ public class Transaction {
         }
 
         public static TransactionChannel getRandomFraudulentChannel() {
-            TransactionChannel[] values = {MOBILE_APP,WEB};
+            TransactionChannel[] values = {MOBILE_APP, WEB};
             return values[ThreadLocalRandom.current().nextInt(values().length)];
         }
     }
 
-//    @Override
-//    public String toString() {
-//        return "TransactionEvent{" +
-//                "transactionId=" + transactionId +
-//                ", accountId='" + accountId + '\'' +
-//                ", timestamp=" + timestamp +
-//                ", transactionType=" + transactionType +
-//                ", amount=" + amount +
-//                ", currency='" + currency + '\'' +
-//                ", merchantCategory='" + merchantCategory + '\'' +
-//                ", merchantLocation=" + merchantLocation +
-//                ", deviceInfo=" + deviceInfo +
-//                ", ipAddress='" + ipAddress + '\'' +
-//                ", transactionChannel=" + transactionChannel +
-//                ", isFraudulent=" + isFraudulent +
-//                '}';
-//    }
+    public enum TransactionStatus {
+        PENDING,
+        APPROVED,
+        DECLINED,
+        FLAGGED,
+        REVERSED,
+        CANCELLED,
+        EXPIRED;
+
+        public static TransactionStatus getRandomStatus() {
+            TransactionStatus[] values = {PENDING, APPROVED, DECLINED, REVERSED, CANCELLED, EXPIRED};
+            return values[ThreadLocalRandom.current().nextInt(values().length)];
+        }
+    }
+
 }

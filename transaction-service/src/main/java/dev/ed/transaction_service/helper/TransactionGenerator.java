@@ -1,59 +1,63 @@
-package dev.ed.transaction_generator_service.service;
+package dev.ed.transaction_service.helper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.ed.transaction_generator_service.model.Transaction;
+
+import dev.ed.transaction_service.client.AccountClient;
+import dev.ed.transaction_service.model.Transaction;
+import dev.ed.transaction_service.repository.TransactionRepository;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
+@RequiredArgsConstructor
 public class TransactionGenerator {
+    private final AccountClient accountClient;
+    private final TransactionRepository transactionRepository;
 
-    private final ObjectMapper objectMapper = new ObjectMapper(); // For JSON serialization
 
     @SneakyThrows
-    public String generateTransactionEvent(String accountId) {
+    public void generateTransactions() {
         Transaction transaction = Transaction.builder()
                 .transactionId(generateUUID())
-                .accountId(accountId)
-                .timestamp(LocalDateTime.from(Instant.now()))
+                .accountId(accountClient.getRandomAccountId().orElseThrow(() -> new EntityNotFoundException("No Accounts Found")))
+                .transactionStatus(Transaction.TransactionStatus.getRandomStatus())
+                .creationDateTime(Instant.now().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                .lastUpdated(Instant.now().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 .transactionType(Transaction.TransactionType.getRandomType())
                 .amount(generateAmountBasedOnProfile(getRandomProfile()))
                 .currency("GBP")
                 .merchantCategory(Transaction.MerchantCategory.getRandomCategory())
-                .deviceInfo(Transaction.DeviceInfo.getRandomInfo())
-                .ipAddress(generateRandomIpAddress())
                 .transactionChannel(Transaction.TransactionChannel.getRandomChannel())
                 .isFraudulent(false)
                 .build();
-
-        return objectMapper.writeValueAsString(transaction);
+        transactionRepository.save(transaction);
     }
 
-
     @SneakyThrows
-    public String injectFraudulentTransaction(String accountId) {
+    public void injectFraudulentTransaction() {
 
         Transaction transaction = Transaction.builder()
                 .transactionId(generateUUID())
-                .accountId(accountId)
-                .timestamp(LocalDateTime.from(Instant.now()))
+                .accountId(accountClient.getRandomAccountId().orElseThrow(() -> new EntityNotFoundException("No Accounts Found")))
+                .transactionStatus(Transaction.TransactionStatus.getRandomStatus())
+                .creationDateTime(LocalDateTime.from(Instant.now()))
+                .lastUpdated(LocalDateTime.from(Instant.now()))
                 .transactionType(Transaction.TransactionType.PURCHASE)
                 .amount(generateAmountBasedOnProfile("HIGH_SPENDER"))
                 .currency("GBP")
                 .merchantCategory(Transaction.MerchantCategory.getRandomFraudulentCategory())
-                .deviceInfo(Transaction.DeviceInfo.getRandomFraudulentInfo())
-                .ipAddress(generateRandomIpAddress())
                 .transactionChannel(Transaction.TransactionChannel.getRandomFraudulentChannel())
                 .isFraudulent(true)
                 .build();
-
-        return objectMapper.writeValueAsString(transaction);
+        transactionRepository.save(transaction);
     }
 
     private UUID generateUUID() {
@@ -97,15 +101,7 @@ public class TransactionGenerator {
         for (int i = 0; i < randomIndex; i++) {
             iterator.next(); // Advance the iterator
         }
-
         return iterator.next().toString(); // Return the element at the random index.
     }
 
-    private String generateRandomIpAddress() {
-        return String.format("%d.%d.%d.%d",
-                ThreadLocalRandom.current().nextInt(256),
-                ThreadLocalRandom.current().nextInt(256),
-                ThreadLocalRandom.current().nextInt(256),
-                ThreadLocalRandom.current().nextInt(256));
-    }
 }

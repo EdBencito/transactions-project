@@ -3,6 +3,7 @@ package dev.ed.account_service.helper;
 import dev.ed.account_service.exception.MaxRetriesException;
 import dev.ed.account_service.model.Account;
 import dev.ed.account_service.repository.AccountRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import net.datafaker.Faker;
 import org.springframework.stereotype.Service;
@@ -13,13 +14,10 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
+@RequiredArgsConstructor
 public class AccountGenerator {
     private final AccountRepository accountRepository;
     private final static Random random = new Random();
-
-    public AccountGenerator(AccountRepository accountRepository) {
-        this.accountRepository = accountRepository;
-    }
 
 
     @SneakyThrows

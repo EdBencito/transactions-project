@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Transactional
@@ -73,5 +74,9 @@ public class AccountService {
 
     public void deleteAccount(UUID accountId) {
         accountRepository.deleteById(accountId);
+    }
+
+    public Optional<UUID> getRandomAccountId() {
+        return accountRepository.findRandomAccountId();
     }
 }

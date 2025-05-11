@@ -2,7 +2,6 @@ package dev.ed.transaction_service.controller;
 
 import dev.ed.transaction_service.DTOs.CreateTransactionDTO;
 import dev.ed.transaction_service.DTOs.TransactionDetailsResponseDTO;
-import dev.ed.transaction_service.helper.TransactionGenerator;
 import dev.ed.transaction_service.helper.TransactionMapper;
 import dev.ed.transaction_service.model.Transaction;
 import dev.ed.transaction_service.service.TransactionService;
@@ -23,7 +22,6 @@ public class TransactionController {
 
     private final TransactionService transactionService;
     private final TransactionMapper transactionMapper;
-    private final TransactionGenerator transactionGenerator;
 
     @PostMapping
     public ResponseEntity<TransactionDetailsResponseDTO> createTransaction(@RequestBody CreateTransactionDTO transactionRequest) {

@@ -4,12 +4,9 @@ import dev.ed.account_service.DTOs.AccountDetailsResponseDTO;
 import dev.ed.account_service.DTOs.BalanceDTO;
 import dev.ed.account_service.DTOs.CreateAccountDTO;
 import dev.ed.account_service.DTOs.DetailsUpdateDTO;
-import dev.ed.account_service.helper.AccountGenerator;
 import dev.ed.account_service.helper.AccountMapper;
 import dev.ed.account_service.model.Account;
 import dev.ed.account_service.service.AccountService;
-import io.swagger.v3.oas.annotations.Hidden;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +23,6 @@ public class AccountController {
 
     private final AccountService accountService;
     private final AccountMapper accountMapper;
-    private final AccountGenerator accountGenerator;
 
 
     @PostMapping

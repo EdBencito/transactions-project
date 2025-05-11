@@ -1,7 +1,6 @@
 package dev.ed.transaction_service.controller;
 
 import dev.ed.transaction_service.helper.TransactionGenerator;
-import dev.ed.transaction_service.helper.TransactionMapper;
 import dev.ed.transaction_service.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,9 +15,7 @@ import java.util.UUID;
 @RequestMapping("/internal/transaction")
 public class InternalTransactionController {
 
-
     private final TransactionService transactionService;
-    private final TransactionMapper transactionMapper;
     private final TransactionGenerator transactionGenerator;
 
     @PostMapping("/batch/generate")

@@ -8,6 +8,6 @@ import java.util.UUID;
 
 @FeignClient(name = "account-service", url = "http://localhost:8080")
 public interface AccountClient {
-    @GetMapping("/accounts/TEST/randomAccountId")
+    @GetMapping("/internal/accounts/randomAccountId")
     Optional<UUID> getRandomAccountId();
 }

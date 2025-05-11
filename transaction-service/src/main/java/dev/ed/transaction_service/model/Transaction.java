@@ -21,9 +21,6 @@ import java.util.concurrent.ThreadLocalRandom;
 @Builder
 
 public class Transaction {
-//    @ManyToOne
-//    @JoinColumn(name = "account_id", referencedColumnName = "accountId")
-//    private Account account;
 
     @Id
     @Column(name = "transaction_id", nullable = false, unique = true)

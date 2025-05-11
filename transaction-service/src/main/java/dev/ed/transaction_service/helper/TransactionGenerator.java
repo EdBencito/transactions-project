@@ -19,9 +19,9 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 @RequiredArgsConstructor
 public class TransactionGenerator {
+
     private final AccountClient accountClient;
     private final TransactionRepository transactionRepository;
-
 
     @SneakyThrows
     public void generateTransactions() {

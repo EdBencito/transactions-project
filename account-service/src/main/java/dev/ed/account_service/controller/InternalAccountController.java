@@ -1,12 +1,6 @@
 package dev.ed.account_service.controller;
 
-import dev.ed.account_service.DTOs.AccountDetailsResponseDTO;
-import dev.ed.account_service.DTOs.BalanceDTO;
-import dev.ed.account_service.DTOs.CreateAccountDTO;
-import dev.ed.account_service.DTOs.DetailsUpdateDTO;
 import dev.ed.account_service.helper.AccountGenerator;
-import dev.ed.account_service.helper.AccountMapper;
-import dev.ed.account_service.model.Account;
 import dev.ed.account_service.service.AccountService;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController

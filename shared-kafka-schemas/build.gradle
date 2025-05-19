@@ -1,0 +1,21 @@
+plugins {
+    id("com.github.davidmc24.gradle.plugin.avro") version "1.8.0"
+
+}
+
+group = 'dev.ed'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("org.apache.avro:avro:1.11.4")
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
+}
+
+avro {
+
+}
+

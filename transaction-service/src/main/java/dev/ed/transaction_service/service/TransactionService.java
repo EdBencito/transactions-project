@@ -1,12 +1,16 @@
 package dev.ed.transaction_service.service;
 
+import dev.ed.avro.TransactionInitiatedEvent;
+import dev.ed.transaction_service.helper.TransactionMapper;
 import dev.ed.transaction_service.model.Transaction;
 import dev.ed.transaction_service.repository.TransactionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,9 +20,17 @@ import java.util.UUID;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
+    private final TransactionMapper transactionMapper;
+    private final KafkaTemplate<String, TransactionInitiatedEvent> kafkaTemplate;
 
     public Transaction createTransaction(Transaction transaction) {
-        return transactionRepository.save(transaction);
+        Transaction saved = transactionRepository.save(transaction);
+        publish(transactionMapper.toTransactionInitiatedEvent(saved));
+        System.out.println("Published" + "\n" +
+                "Transaction: " + transaction.getTransactionId() +
+                "from Account: " + transaction.getTransactionId() +
+                "at: " + Instant.now());
+        return saved;
     }
 
     public Transaction getTransaction(UUID transactionId) {
@@ -34,4 +46,7 @@ public class TransactionService {
         transactionRepository.deleteById(transactionId);
     }
 
+    public void publish(TransactionInitiatedEvent event) {
+        kafkaTemplate.send("transactions", event.getTransactionId(), event);
+    }
 }

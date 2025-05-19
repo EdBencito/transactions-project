@@ -1,0 +1,32 @@
+{
+  "namespace": "dev.ed.avro",
+  "type": "record",
+  "name": "TransactionInitiatedEvent",
+  "fields": [
+    { "name": "transactionId", "type": "string" },
+    { "name": "AccountId", "type": "string" },
+    {
+      "name": "amount",
+      "type": {
+        "type": "bytes",
+        "logicalType": "decimal",
+        "precision": 38,
+        "scale": 2
+      }
+    },
+    {
+      "name": "timestamp",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "transactionDate",
+      "type": {
+        "type": "int",
+        "logicalType": "date"
+      }
+    }
+  ]
+}

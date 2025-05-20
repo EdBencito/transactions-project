@@ -11,7 +11,7 @@ import java.time.Instant;
 @Service
 public class TransactionProcessorService {
 
-    @KafkaListener(topics = "transactions", groupId = "transaction-processor")
+    @KafkaListener(topics = "${kafka.topic.transaction-initiated}", groupId = "transaction-processor")
     public void process(TransactionInitiatedEvent event) {
 
         System.out.println("Received" + "\n" +

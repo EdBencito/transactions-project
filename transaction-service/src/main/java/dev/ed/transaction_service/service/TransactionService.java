@@ -6,6 +6,7 @@ import dev.ed.transaction_service.model.Transaction;
 import dev.ed.transaction_service.repository.TransactionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,8 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
     private final KafkaTemplate<String, TransactionInitiatedEvent> kafkaTemplate;
+    @Value("${app.kafka.topic.transaction-service}")
+    private String transactionServiceTopic;
 
     public Transaction createTransaction(Transaction transaction) {
         Transaction saved = transactionRepository.save(transaction);
@@ -47,6 +50,6 @@ public class TransactionService {
     }
 
     public void publish(TransactionInitiatedEvent event) {
-        kafkaTemplate.send("transactions", event.getTransactionId(), event);
+        kafkaTemplate.send(transactionServiceTopic, event.getTransactionId(), event);
     }
 }

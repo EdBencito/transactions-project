@@ -11,7 +11,7 @@ import java.time.Instant;
 @Service
 public class FraudDetectionService {
 
-    @KafkaListener(topics = "transactions", groupId = "fraud-detection")
+    @KafkaListener(topics = "${kafka.topic.transaction-initiated}", groupId = "fraud-detection")
     public void process(TransactionInitiatedEvent event) {
 
         System.out.println("Received" + "\n" +

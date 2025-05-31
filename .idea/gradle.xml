@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/account-service" />
             <option value="$PROJECT_DIR$/fraud-detection-service" />
             <option value="$PROJECT_DIR$/shared-kafka-schemas" />
+            <option value="$PROJECT_DIR$/shared-library" />
             <option value="$PROJECT_DIR$/transaction-processor-service" />
             <option value="$PROJECT_DIR$/transaction-service" />
           </set>

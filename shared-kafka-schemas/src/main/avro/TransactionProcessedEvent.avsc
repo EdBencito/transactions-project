@@ -1,10 +1,11 @@
 {
-  "namespace": "dev.ed.avro",
   "type": "record",
-  "name": "TransactionInitiatedEvent",
+  "name": "TransactionProcessedEvent",
+  "namespace": "dev.ed.avro",
   "fields": [
     { "name": "transactionId", "type": "string" },
     { "name": "AccountId", "type": "string" },
+
     {
       "name": "transactionStatus",
       "type": {
@@ -30,22 +31,11 @@
       }
     },
     {
-      "name": "timestamp",
+      "name": "processedAt",
       "type": {
         "type": "long",
         "logicalType": "timestamp-millis"
       }
-    },
-    {
-      "name": "transactionDate",
-      "type": {
-        "type": "int",
-        "logicalType": "date"
-      }
-    },
-    {
-      "name": "isFlagged",
-      "type": "boolean"
     }
   ]
 }

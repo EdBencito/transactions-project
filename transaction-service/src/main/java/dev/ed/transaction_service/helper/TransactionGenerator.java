@@ -1,6 +1,10 @@
 package dev.ed.transaction_service.helper;
 
 
+import dev.ed.shared.enums.MerchantCategory;
+import dev.ed.shared.enums.TransactionChannel;
+import dev.ed.shared.enums.TransactionStatus;
+import dev.ed.shared.enums.TransactionType;
 import dev.ed.transaction_service.client.AccountClient;
 import dev.ed.transaction_service.model.Transaction;
 import dev.ed.transaction_service.repository.TransactionRepository;
@@ -29,14 +33,14 @@ public class TransactionGenerator {
         Transaction transaction = Transaction.builder()
                 .transactionId(generateUUID())
                 .accountId(accountClient.getRandomAccountId().orElseThrow(() -> new EntityNotFoundException("No Accounts Found")))
-                .transactionStatus(Transaction.TransactionStatus.getRandomStatus())
+                .transactionStatus(TransactionStatus.getRandomStatus())
                 .creationDateTime(Instant.now().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 .lastUpdated(Instant.now().atZone(ZoneId.systemDefault()).toLocalDateTime())
-                .transactionType(Transaction.TransactionType.getRandomType())
+                .transactionType(TransactionType.getRandomType())
                 .amount(generateAmountBasedOnProfile(getRandomProfile()))
                 .currency("GBP")
-                .merchantCategory(Transaction.MerchantCategory.getRandomCategory())
-                .transactionChannel(Transaction.TransactionChannel.getRandomChannel())
+                .merchantCategory(MerchantCategory.getRandomCategory())
+                .transactionChannel(TransactionChannel.getRandomChannel())
                 .isFraudulent(false)
                 .build();
         transactionRepository.save(transaction);
@@ -48,14 +52,14 @@ public class TransactionGenerator {
         Transaction transaction = Transaction.builder()
                 .transactionId(generateUUID())
                 .accountId(accountClient.getRandomAccountId().orElseThrow(() -> new EntityNotFoundException("No Accounts Found")))
-                .transactionStatus(Transaction.TransactionStatus.getRandomStatus())
+                .transactionStatus(TransactionStatus.getRandomStatus())
                 .creationDateTime(LocalDateTime.from(Instant.now()))
                 .lastUpdated(LocalDateTime.from(Instant.now()))
-                .transactionType(Transaction.TransactionType.PURCHASE)
+                .transactionType(TransactionType.DEBIT)
                 .amount(generateAmountBasedOnProfile("HIGH_SPENDER"))
                 .currency("GBP")
-                .merchantCategory(Transaction.MerchantCategory.getRandomFraudulentCategory())
-                .transactionChannel(Transaction.TransactionChannel.getRandomFraudulentChannel())
+                .merchantCategory(MerchantCategory.getRandomFraudulentCategory())
+                .transactionChannel(TransactionChannel.getRandomFraudulentChannel())
                 .isFraudulent(true)
                 .build();
         transactionRepository.save(transaction);

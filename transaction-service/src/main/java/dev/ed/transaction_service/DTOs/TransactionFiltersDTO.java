@@ -1,6 +1,6 @@
 package dev.ed.transaction_service.DTOs;
 
-import dev.ed.transaction_service.model.Transaction;
+import dev.ed.shared.enums.TransactionStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class TransactionFiltersDTO {
     private UUID accountId;
-    private Transaction.TransactionStatus transactionStatus;
+    private TransactionStatus transactionStatus;
     private LocalDateTime creationDate;
     private LocalDateTime lastUpdated;
 }

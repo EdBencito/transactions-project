@@ -1,0 +1,34 @@
+{
+  "type": "record",
+  "name": "BalanceUpdateEvent",
+  "namespace": "dev.ed.avro",
+  "fields": [
+    { "name": "transactionId", "type": "string" },
+    { "name": "accountId", "type": "string" },
+    {
+      "name": "amount",
+      "type": {
+        "type": "bytes",
+        "logicalType": "decimal",
+        "precision": 38,
+        "scale": 2
+      }
+    },
+    {
+      "name": "transactionType",
+      "type": {
+        "type": "enum",
+        "name": "TransactionType",
+        "symbols": ["DEBIT", "CREDIT", "REVERSAL"]
+      }
+    },
+    { "name": "currency", "type": "string" },
+    {
+      "name": "lastUpdated",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    }
+  ]
+}

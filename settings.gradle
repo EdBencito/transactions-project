@@ -1,3 +1,4 @@
 rootProject.name = 'transactions-project'
 include('transaction-service', 'transaction-processor-service', 'fraud-detection-service', 'account-service', 'shared-kafka-schemas')
+include 'shared-library'
 

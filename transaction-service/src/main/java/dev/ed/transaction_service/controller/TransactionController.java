@@ -1,7 +1,8 @@
 package dev.ed.transaction_service.controller;
 
+import dev.ed.shared.DTOs.TransactionDetailsResponseDTO;
+import dev.ed.shared.DTOs.TransactionDetailsUpdateDTO;
 import dev.ed.transaction_service.DTOs.CreateTransactionDTO;
-import dev.ed.transaction_service.DTOs.TransactionDetailsResponseDTO;
 import dev.ed.transaction_service.helper.TransactionMapper;
 import dev.ed.transaction_service.model.Transaction;
 import dev.ed.transaction_service.service.TransactionService;
@@ -19,7 +20,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/transaction")
 public class TransactionController {
 
-
     private final TransactionService transactionService;
     private final TransactionMapper transactionMapper;
 
@@ -33,6 +33,12 @@ public class TransactionController {
     public ResponseEntity<TransactionDetailsResponseDTO> getTransaction(@PathVariable UUID transactionId) {
         Transaction transaction = transactionService.getTransaction(transactionId);
         return new ResponseEntity<>(transactionMapper.toResponseDTO(transaction), HttpStatus.OK);
+    }
+
+    @PatchMapping("/{transactionId}/transactionDetails")
+    public ResponseEntity<TransactionDetailsResponseDTO> updateTransactionDetails(@RequestBody TransactionDetailsUpdateDTO detailsUpdateRequest) {
+        Transaction updatedTransaction = transactionService.updateTransactionDetails(detailsUpdateRequest.getTransactionId(), detailsUpdateRequest);
+        return new ResponseEntity<>(transactionMapper.toResponseDTO(updatedTransaction), HttpStatus.OK);
     }
 
     @GetMapping("/listTransactions/{accountId}")

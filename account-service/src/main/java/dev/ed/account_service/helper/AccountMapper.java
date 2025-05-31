@@ -5,6 +5,8 @@ import dev.ed.account_service.DTOs.CreateAccountDTO;
 import dev.ed.account_service.exception.MaxRetriesException;
 import dev.ed.account_service.model.Account;
 import dev.ed.account_service.repository.AccountRepository;
+import dev.ed.shared.DTOs.TransactionDetailsResponseDTO;
+import dev.ed.shared.DTOs.TransactionDetailsUpdateDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +45,29 @@ public class AccountMapper {
                 .balance(dto.getBalance() != null ? dto.getBalance() : BigDecimal.valueOf(0.00))
                 .interestRate(dto.getInterestRate() != null ? dto.getInterestRate() : BigDecimal.valueOf(4.5))
                 .creditLimit(dto.getCreditLimit() != null ? dto.getCreditLimit() : BigDecimal.valueOf(4000))
+                .build();
+    }
+
+    public TransactionDetailsResponseDTO toTransactionResponseDTO(TransactionDetailsResponseDTO transactionDetailsResponseDTO) {
+        return  TransactionDetailsResponseDTO.builder()
+                .transactionId(transactionDetailsResponseDTO.getTransactionId())
+                .accountId(transactionDetailsResponseDTO.getAccountId())
+                .transactionStatus(transactionDetailsResponseDTO.getTransactionStatus())
+                .creationDate(transactionDetailsResponseDTO.getCreationDate())
+                .lastUpdated(transactionDetailsResponseDTO.getLastUpdated())
+                .transactionType(transactionDetailsResponseDTO.getTransactionType())
+                .currency(transactionDetailsResponseDTO.getCurrency())
+                .amount(transactionDetailsResponseDTO.getAmount())
+                .merchantCategory(transactionDetailsResponseDTO.getMerchantCategory())
+                .transactionChannel(transactionDetailsResponseDTO.getTransactionChannel())
+                .isFraudulent(transactionDetailsResponseDTO.isFraudulent())
+                .build();
+    }
+
+    public TransactionDetailsUpdateDTO toTransactionUpdateDetailsDTO(TransactionDetailsUpdateDTO transactionDetailsUpdateDTO) {
+        return  TransactionDetailsUpdateDTO.builder()
+                .transactionId(transactionDetailsUpdateDTO.getTransactionId())
+                .transactionStatus(transactionDetailsUpdateDTO.getTransactionStatus())
                 .build();
     }
 

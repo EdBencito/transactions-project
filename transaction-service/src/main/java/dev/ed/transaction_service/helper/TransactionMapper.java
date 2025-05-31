@@ -1,18 +1,19 @@
 package dev.ed.transaction_service.helper;
 
+import dev.ed.avro.BalanceUpdateEvent;
+import dev.ed.avro.TransactionFlaggedEvent;
 import dev.ed.avro.TransactionInitiatedEvent;
+import dev.ed.avro.TransactionProcessedEvent;
+import dev.ed.shared.DTOs.TransactionDetailsResponseDTO;
+import dev.ed.shared.enums.TransactionStatus;
+import dev.ed.shared.enums.TransactionType;
 import dev.ed.transaction_service.DTOs.CreateTransactionDTO;
-import dev.ed.transaction_service.DTOs.TransactionDetailsResponseDTO;
 import dev.ed.transaction_service.exception.MaxRetriesException;
 import dev.ed.transaction_service.model.Transaction;
 import dev.ed.transaction_service.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.avro.Conversions;
-import org.apache.avro.LogicalTypes;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Component
 public class TransactionMapper {
+
     private final TransactionRepository transactionRepository;
 
     public TransactionDetailsResponseDTO toResponseDTO(Transaction transaction) {
@@ -43,7 +45,7 @@ public class TransactionMapper {
         return Transaction.builder()
                 .transactionId(generateUUID())
                 .accountId(dto.getAccountId())
-                .transactionStatus(Transaction.TransactionStatus.PENDING)
+                .transactionStatus(TransactionStatus.PENDING)
                 .creationDateTime(Instant.now().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 .lastUpdated(Instant.now().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 .transactionType(dto.getTransactionType())
@@ -56,13 +58,37 @@ public class TransactionMapper {
     }
 
     public TransactionInitiatedEvent toTransactionInitiatedEvent(Transaction transaction) {
-         return TransactionInitiatedEvent.newBuilder()
-                 .setTransactionId(String.valueOf(transaction.getTransactionId()))
-                 .setAccountId(String.valueOf(transaction.getAccountId()))
-                 .setAmount(transaction.getAmount())
-                 .setTimestamp(toEpochMilliseconds(transaction.getCreationDateTime()))
-                 .setTransactionDate(transaction.getCreationDateTime().toLocalDate())
-                 .build();
+        return TransactionInitiatedEvent.newBuilder()
+                .setTransactionId(String.valueOf(transaction.getTransactionId()))
+                .setAccountId(String.valueOf(transaction.getAccountId()))
+                .setTransactionStatus(mapToAvroStatus(transaction.getTransactionStatus()))
+                .setAmount(transaction.getAmount())
+                .setTimestamp(toEpochMilliseconds(transaction.getCreationDateTime()))
+                .setTransactionDate(transaction.getCreationDateTime().toLocalDate())
+                .setIsFlagged(transaction.isFraudulent())
+                .build();
+    }
+
+    public BalanceUpdateEvent toBalanceUpdateEvent(Transaction transaction,TransactionFlaggedEvent transactionFlaggedEvent) {
+        return BalanceUpdateEvent.newBuilder()
+                .setTransactionId(transactionFlaggedEvent.getTransactionId())
+                .setAccountId(transactionFlaggedEvent.getAccountId())
+                .setAmount(transactionFlaggedEvent.getAmount())
+                .setTransactionType(mapToAvroTransactionType(transaction.getTransactionType()))
+                .setCurrency(transaction.getCurrency())
+                .setLastUpdated(transactionFlaggedEvent.getFlaggedAt())
+                .build();
+    }
+
+    public BalanceUpdateEvent toBalanceUpdateEvent(Transaction transaction,TransactionProcessedEvent transactionProcessedEvent) {
+        return BalanceUpdateEvent.newBuilder()
+                .setTransactionId(transactionProcessedEvent.getTransactionId())
+                .setAccountId(transactionProcessedEvent.getAccountId())
+                .setAmount(transactionProcessedEvent.getAmount())
+                .setTransactionType(mapToAvroTransactionType(transaction.getTransactionType()))
+                .setCurrency(transaction.getCurrency())
+                .setLastUpdated(transactionProcessedEvent.getProcessedAt())
+                .build();
     }
 
     private UUID generateUUID() {
@@ -78,17 +104,19 @@ public class TransactionMapper {
         return accountId;
     }
 
-
-
-
-    private Instant toEpochMilliseconds(LocalDateTime timestamp){
+    private Instant toEpochMilliseconds(LocalDateTime timestamp) {
         return timestamp.atZone(ZoneId.systemDefault()).toInstant();
     }
-
 
     public static LocalDateTime toLocalDateTime(long timestampMillis) {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestampMillis), ZoneId.systemDefault());
     }
 
+    private dev.ed.avro.TransactionStatus mapToAvroStatus(TransactionStatus status) {
+        return dev.ed.avro.TransactionStatus.valueOf(status.name());
+    }
 
+    private dev.ed.avro.TransactionType mapToAvroTransactionType(TransactionType transactionType) {
+        return dev.ed.avro.TransactionType.valueOf(transactionType.name());
+    }
 }

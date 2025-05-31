@@ -1,6 +1,9 @@
-package dev.ed.transaction_service.DTOs;
+package dev.ed.shared.DTOs;
 
-import dev.ed.transaction_service.model.Transaction;
+import dev.ed.shared.enums.MerchantCategory;
+import dev.ed.shared.enums.TransactionChannel;
+import dev.ed.shared.enums.TransactionStatus;
+import dev.ed.shared.enums.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,13 +20,13 @@ import java.util.UUID;
 public class TransactionDetailsResponseDTO {
     private UUID transactionId;
     private UUID accountId;
-    private Transaction.TransactionStatus transactionStatus;
+    private TransactionStatus transactionStatus;
     private LocalDateTime creationDate;
     private LocalDateTime lastUpdated;
-    private Transaction.TransactionType transactionType;
+    private TransactionType transactionType;
     private String currency;
     private BigDecimal amount;
-    private Transaction.MerchantCategory merchantCategory;
-    private Transaction.TransactionChannel transactionChannel;
+    private MerchantCategory merchantCategory;
+    private TransactionChannel transactionChannel;
     private boolean isFraudulent;
 }

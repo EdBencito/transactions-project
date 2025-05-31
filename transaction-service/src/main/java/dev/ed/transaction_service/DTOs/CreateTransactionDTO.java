@@ -1,5 +1,8 @@
 package dev.ed.transaction_service.DTOs;
 
+import dev.ed.shared.enums.MerchantCategory;
+import dev.ed.shared.enums.TransactionChannel;
+import dev.ed.shared.enums.TransactionType;
 import dev.ed.transaction_service.model.Transaction;
 import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
@@ -17,7 +20,7 @@ public class CreateTransactionDTO {
     @DecimalMin("0.0")
     private BigDecimal amount;
     private String currency;
-    private Transaction.TransactionType transactionType;
-    private Transaction.MerchantCategory merchantCategory;
-    private Transaction.TransactionChannel transactionChannel;
+    private TransactionType transactionType;
+    private MerchantCategory merchantCategory;
+    private TransactionChannel transactionChannel;
 }

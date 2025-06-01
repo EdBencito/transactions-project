@@ -41,7 +41,7 @@ All services communicate via **Kafka topics**, using **Avro-encoded messages** f
 6. **Final Commit**
    `AccountService` consumes the event and updates the account balance.
 
-![transactions project Sequence Diagram](./images/transaction-flow.png)
+![transactions project Sequence Diagram](./images/transactions-project-sqeuence.svg)
 
 ---
 

@@ -61,7 +61,7 @@ public class TransactionMapper {
         return TransactionInitiatedEvent.newBuilder()
                 .setTransactionId(String.valueOf(transaction.getTransactionId()))
                 .setAccountId(String.valueOf(transaction.getAccountId()))
-                .setTransactionStatus(mapToAvroStatus(transaction.getTransactionStatus()))
+                .setTransactionStatus(mapToAvroTransactionStatus(transaction.getTransactionStatus()))
                 .setAmount(transaction.getAmount())
                 .setTimestamp(toEpochMilliseconds(transaction.getCreationDateTime()))
                 .setTransactionDate(transaction.getCreationDateTime().toLocalDate())
@@ -112,8 +112,12 @@ public class TransactionMapper {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestampMillis), ZoneId.systemDefault());
     }
 
-    private dev.ed.avro.TransactionStatus mapToAvroStatus(TransactionStatus status) {
+    public dev.ed.avro.TransactionStatus mapToAvroTransactionStatus(TransactionStatus status) {
         return dev.ed.avro.TransactionStatus.valueOf(status.name());
+    }
+
+    public TransactionStatus mapToSharedTransactionStatus(dev.ed.avro.TransactionStatus status) {
+        return TransactionStatus.valueOf(status.name());
     }
 
     private dev.ed.avro.TransactionType mapToAvroTransactionType(TransactionType transactionType) {

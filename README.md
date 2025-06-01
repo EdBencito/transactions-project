@@ -41,6 +41,8 @@ All services communicate via **Kafka topics**, using **Avro-encoded messages** f
 6. **Final Commit**
    `AccountService` consumes the event and updates the account balance.
 
+<div style="width: 640px; height: 480px; margin: 10px; position: relative;"><iframe allowfullscreen frameborder="0" style="width:640px; height:480px" src="https://lucid.app/documents/embedded/4e863012-78aa-439a-b6b2-02a893fdfec2" id="g-5kGzeDib7x"></iframe></div>
+
 ---
 
 ## Technical Stack

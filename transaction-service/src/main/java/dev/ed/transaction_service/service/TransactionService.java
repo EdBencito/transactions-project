@@ -77,17 +77,37 @@ public class TransactionService {
 
     @KafkaListener(topics = "${app.kafka.topic.transaction-processor-service}", groupId = "transaction-service", containerFactory = "transactionProcessedEventConcurrentKafkaListenerContainerFactory")
     public void handleProcessedEvent(TransactionProcessedEvent event) {
-        TransactionDetailsUpdateDTO newDetails = new TransactionDetailsUpdateDTO();
-        newDetails.setTransactionId(UUID.fromString(event.getTransactionId()));
-        newDetails.setTransactionStatus(TransactionStatus.APPROVED);
         Transaction transaction = getTransaction(UUID.fromString(event.getTransactionId()));
-        updateTransactionDetails(UUID.fromString(event.getTransactionId()), newDetails);
-        publish(transactionMapper.toBalanceUpdateEvent(transaction, event));
+        UUID transactionId = transaction.getTransactionId();
+
+        if (transaction.getTransactionStatus().equals(TransactionStatus.FLAGGED)) {
+            System.out.println("Skipping processing for flagged transaction: {} " + transactionId);
+        }
+
+        TransactionDetailsUpdateDTO newDetails = new TransactionDetailsUpdateDTO();
+        newDetails.setTransactionId(transactionId);
+        newDetails.setTransactionStatus(transactionMapper.mapToSharedTransactionStatus(event.getTransactionStatus()));
+        updateTransactionDetails(transactionId, newDetails);
+
+        if (event.getTransactionStatus().equals(transactionMapper.mapToAvroTransactionStatus(TransactionStatus.APPROVED))) {
+            publish(transactionMapper.toBalanceUpdateEvent(transaction, event));
+        }
     }
 
     @KafkaListener(topics = "${app.kafka.topic.fraud-detection-service}", groupId = "transaction-service", containerFactory = "transactionFlaggedEventConcurrentKafkaListenerContainerFactory")
     public void handleFlaggedEvent(TransactionFlaggedEvent event) {
         Transaction transaction = getTransaction(UUID.fromString(event.getTransactionId()));
-        publish(transactionMapper.toBalanceUpdateEvent(transaction, event));
+        UUID transactionId = transaction.getTransactionId();
+
+        if (transaction.getTransactionStatus() != TransactionStatus.FLAGGED) {
+            TransactionDetailsUpdateDTO flaggedDetails = new TransactionDetailsUpdateDTO();
+            flaggedDetails.setTransactionId(transactionId);
+            flaggedDetails.setTransactionStatus(TransactionStatus.FLAGGED);
+            updateTransactionDetails(transactionId, flaggedDetails);
+        }
+
+        if (transaction.getTransactionStatus().equals(TransactionStatus.APPROVED)) {
+            publish(transactionMapper.toBalanceUpdateEvent(transaction, event));
+        }
     }
 }

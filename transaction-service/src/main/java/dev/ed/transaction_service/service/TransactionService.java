@@ -81,7 +81,7 @@ public class TransactionService {
         newDetails.setTransactionId(UUID.fromString(event.getTransactionId()));
         newDetails.setTransactionStatus(TransactionStatus.APPROVED);
         Transaction transaction = getTransaction(UUID.fromString(event.getTransactionId()));
-        updateTransactionDetails(UUID.fromString(event.getTransactionId()),newDetails);
+        updateTransactionDetails(UUID.fromString(event.getTransactionId()), newDetails);
         publish(transactionMapper.toBalanceUpdateEvent(transaction, event));
     }
 

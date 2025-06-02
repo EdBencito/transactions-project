@@ -3,6 +3,8 @@ package dev.ed.account_service.helper;
 import dev.ed.account_service.exception.MaxRetriesException;
 import dev.ed.account_service.model.Account;
 import dev.ed.account_service.repository.AccountRepository;
+import dev.ed.shared.enums.AccountStatus;
+import dev.ed.shared.enums.AccountType;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import net.datafaker.Faker;
@@ -25,8 +27,8 @@ public class AccountGenerator {
         Account account = Account.builder()
                 .accountId(generateUUID())
                 .accountNumber(generateAccountNumber())
-                .accountType(Account.AccountType.getRandomAccountType())
-                .accountStatus(Account.AccountStatus.ACTIVE)
+                .accountType(AccountType.getRandomAccountType())
+                .accountStatus(AccountStatus.ACTIVE)
                 .accountHolderName(generateRandomName())
                 .openingDate(generateOpeningDate())
                 .currency(random.nextBoolean() ? "USD" : "GBP")

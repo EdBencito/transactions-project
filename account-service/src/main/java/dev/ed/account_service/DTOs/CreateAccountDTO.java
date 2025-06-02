@@ -1,6 +1,7 @@
 package dev.ed.account_service.DTOs;
 
 import dev.ed.account_service.model.Account;
+import dev.ed.shared.enums.AccountType;
 import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +15,7 @@ import java.math.BigDecimal;
 public class CreateAccountDTO {
 
     private String accountHolderName;
-    private Account.AccountType accountType;
+    private AccountType accountType;
     private String currency;
 
     @DecimalMin("0.0")

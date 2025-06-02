@@ -1,5 +1,7 @@
 package dev.ed.account_service.model;
 
+import dev.ed.shared.enums.AccountStatus;
+import dev.ed.shared.enums.AccountType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -67,24 +69,5 @@ public class Account {
     @NotNull(message = "creditLimit is required")
     private BigDecimal creditLimit;
 
-    public enum AccountType {
-        SAVINGS,
-        CHECKING,
-        CREDIT_CARD,
-        LOAN,
-        INVESTMENT;
 
-        public static AccountType getRandomAccountType() {
-            AccountType[] values = AccountType.values();
-            return values[ThreadLocalRandom.current().nextInt(values().length)];
-        }
-    }
-
-    public enum AccountStatus {
-        ACTIVE,
-        INACTIVE,
-        PENDING,
-        CLOSED,
-        FROZEN;
-    }
 }

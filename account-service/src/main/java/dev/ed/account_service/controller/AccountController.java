@@ -1,6 +1,6 @@
 package dev.ed.account_service.controller;
 
-import dev.ed.account_service.DTOs.AccountDetailsResponseDTO;
+import dev.ed.shared.DTOs.AccountDetailsResponseDTO;
 import dev.ed.account_service.DTOs.BalanceDTO;
 import dev.ed.account_service.DTOs.CreateAccountDTO;
 import dev.ed.account_service.DTOs.DetailsUpdateDTO;

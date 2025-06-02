@@ -1,12 +1,13 @@
 package dev.ed.account_service.helper;
 
-import dev.ed.account_service.DTOs.AccountDetailsResponseDTO;
+import dev.ed.shared.DTOs.AccountDetailsResponseDTO;
 import dev.ed.account_service.DTOs.CreateAccountDTO;
 import dev.ed.account_service.exception.MaxRetriesException;
 import dev.ed.account_service.model.Account;
 import dev.ed.account_service.repository.AccountRepository;
 import dev.ed.shared.DTOs.TransactionDetailsResponseDTO;
 import dev.ed.shared.DTOs.TransactionDetailsUpdateDTO;
+import dev.ed.shared.enums.AccountStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +39,7 @@ public class AccountMapper {
                 .accountId(generateUUID())
                 .accountNumber(generateAccountNumber())
                 .accountType(dto.getAccountType())
-                .accountStatus(Account.AccountStatus.ACTIVE)
+                .accountStatus(AccountStatus.ACTIVE)
                 .accountHolderName(dto.getAccountHolderName())
                 .openingDate(LocalDate.now())
                 .currency("GBP")

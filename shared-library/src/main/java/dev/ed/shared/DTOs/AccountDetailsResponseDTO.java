@@ -1,6 +1,7 @@
-package dev.ed.account_service.DTOs;
+package dev.ed.shared.DTOs;
 
-import dev.ed.account_service.model.Account;
+import dev.ed.shared.enums.AccountStatus;
+import dev.ed.shared.enums.AccountType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,8 +15,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class AccountDetailsResponseDTO {
     private String accountNumber;
-    private Account.AccountType accountType;
-    private Account.AccountStatus accountStatus;
+    private AccountType accountType;
+    private AccountStatus accountStatus;
     private String accountHolderName;
     private String currency;
     private BigDecimal balance;

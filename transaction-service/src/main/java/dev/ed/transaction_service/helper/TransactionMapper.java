@@ -62,6 +62,7 @@ public class TransactionMapper {
                 .setTransactionId(String.valueOf(transaction.getTransactionId()))
                 .setAccountId(String.valueOf(transaction.getAccountId()))
                 .setTransactionStatus(mapToAvroTransactionStatus(transaction.getTransactionStatus()))
+                .setTransactionType(mapToAvroTransactionType(transaction.getTransactionType()))
                 .setAmount(transaction.getAmount())
                 .setTimestamp(toEpochMilliseconds(transaction.getCreationDateTime()))
                 .setTransactionDate(transaction.getCreationDateTime().toLocalDate())

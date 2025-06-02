@@ -71,9 +71,6 @@ public class TransactionService {
         kafkaTemplate.send(transactionServiceTopic, event.getTransactionId(), event);
     }
 
-    public void publish(BalanceUpdateEvent event) {
-        kafkaTemplateBalanceUpdate.send(balanceUpdateTopic, event.getTransactionId(), event);
-    }
 
     @KafkaListener(topics = "${app.kafka.topic.transaction-processor-service}", groupId = "transaction-service", containerFactory = "transactionProcessedEventConcurrentKafkaListenerContainerFactory")
     public void handleProcessedEvent(TransactionProcessedEvent event) {
@@ -109,5 +106,9 @@ public class TransactionService {
         if (transaction.getTransactionStatus().equals(TransactionStatus.APPROVED)) {
             publish(transactionMapper.toBalanceUpdateEvent(transaction, event));
         }
+    }
+
+    public void publish(BalanceUpdateEvent event) {
+        kafkaTemplateBalanceUpdate.send(balanceUpdateTopic, event.getTransactionId(), event);
     }
 }

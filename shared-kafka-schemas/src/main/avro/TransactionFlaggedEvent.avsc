@@ -6,6 +6,21 @@
     { "name": "transactionId", "type": "string" },
     { "name": "AccountId", "type": "string" },
     {
+      "name": "transactionStatus",
+      "type": {
+        "type": "enum",
+        "name": "TransactionStatus",
+        "symbols": [
+          "PENDING",
+          "APPROVED",
+          "DECLINED",
+          "FLAGGED",
+          "REVERSED",
+          "CANCELLED"
+        ]
+      }
+    },
+    {
       "name": "amount",
       "type": {
         "type": "bytes",

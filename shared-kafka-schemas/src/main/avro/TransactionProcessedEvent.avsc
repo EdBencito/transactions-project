@@ -5,7 +5,6 @@
   "fields": [
     { "name": "transactionId", "type": "string" },
     { "name": "AccountId", "type": "string" },
-
     {
       "name": "transactionStatus",
       "type": {

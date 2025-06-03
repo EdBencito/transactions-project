@@ -93,18 +93,22 @@ public class TransactionService {
 
     @KafkaListener(topics = "${app.kafka.topic.fraud-detection-service}", groupId = "transaction-service", containerFactory = "transactionFlaggedEventConcurrentKafkaListenerContainerFactory")
     public void handleFlaggedEvent(TransactionFlaggedEvent event) {
-        Transaction transaction = getTransaction(UUID.fromString(event.getTransactionId()));
-        UUID transactionId = transaction.getTransactionId();
+        try {
+            Transaction transaction = getTransaction(UUID.fromString(event.getTransactionId()));
+            UUID transactionId = transaction.getTransactionId();
 
-        if (transaction.getTransactionStatus() != TransactionStatus.FLAGGED) {
-            TransactionDetailsUpdateDTO flaggedDetails = new TransactionDetailsUpdateDTO();
-            flaggedDetails.setTransactionId(transactionId);
-            flaggedDetails.setTransactionStatus(TransactionStatus.FLAGGED);
-            updateTransactionDetails(transactionId, flaggedDetails);
-        }
+            if (transaction.getTransactionStatus() != TransactionStatus.FLAGGED) {
+                TransactionDetailsUpdateDTO flaggedDetails = new TransactionDetailsUpdateDTO();
+                flaggedDetails.setTransactionId(transactionId);
+                flaggedDetails.setTransactionStatus(TransactionStatus.FLAGGED);
+                updateTransactionDetails(transactionId, flaggedDetails);
+            }
 
-        if (transaction.getTransactionStatus().equals(TransactionStatus.APPROVED)) {
-            publish(transactionMapper.toBalanceUpdateEvent(transaction, event));
+            if (transaction.getTransactionStatus().equals(TransactionStatus.APPROVED)) {
+                publish(transactionMapper.toBalanceUpdateEvent(transaction, event));
+            }
+        } catch (Exception e) {
+            System.out.println("Error sending balance update event" + e.getMessage());
         }
     }
 

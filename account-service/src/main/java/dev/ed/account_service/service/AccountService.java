@@ -66,36 +66,39 @@ public class AccountService {
     }
 
     private void updateBalance(BalanceUpdateEvent event) {
-//        TransactionDetailsResponseDTO originalTransaction = accountMapper.toTransactionResponseDTO(transactionClient.getTransaction(UUID.fromString(event.getTransactionId())).orElseThrow(() -> new EntityNotFoundException("Transaction not found with ID: ")));
-        Account account = getAccountDetails(UUID.fromString(event.getAccountId()));
-        switch (event.getTransactionType()) {
-            case CREDIT -> {
-                account.setBalance(account.getBalance().add(event.getAmount()));
-                System.out.println("Account: " + event.getAccountId() + " balance has been changed due to transaction:" + event.getTransactionId() + " with an amount of:" + event.getAmount() + " " + event.getTransactionType());
-
-            }
-            case DEBIT -> {
-                account.setBalance(account.getBalance().subtract(event.getAmount()));
-                System.out.println("Account: " + event.getAccountId() + " balance has been changed due to transaction:" + event.getTransactionId() + " with an amount of:" + event.getAmount() + " " + event.getTransactionType());
-
-            }
-            case REVERSAL -> {
-                if (event.getTransactionType() == TransactionType.DEBIT) {
+        try {
+            Account account = getAccountDetails(UUID.fromString(event.getAccountId()));
+            switch (event.getTransactionType()) {
+                case CREDIT -> {
                     account.setBalance(account.getBalance().add(event.getAmount()));
-                    System.out.println("Account: " + event.getAccountId() + " balance has been changed due to flagged transaction:" + event.getTransactionId() + " with an amount of:" + event.getAmount() + " " + TransactionType.CREDIT);
+                    System.out.println("Account: " + event.getAccountId() + " balance has been changed due to transaction:" + event.getTransactionId() + " with an amount of:" + event.getAmount() + " " + event.getTransactionType());
 
-                } else if (event.getTransactionType() == TransactionType.CREDIT) {
-                    account.setBalance(account.getBalance().subtract(event.getAmount()));
-                    System.out.println("Account: " + event.getAccountId() + " balance has been changed due to flagged transaction:" + event.getTransactionId() + " with an amount of:" + event.getAmount() + " " + TransactionType.DEBIT);
                 }
-                TransactionDetailsUpdateDTO updateDTO = new TransactionDetailsUpdateDTO();
-                updateDTO.setTransactionId(UUID.fromString(event.getTransactionId()));
-                updateDTO.setTransactionStatus(TransactionStatus.valueOf("REVERSED"));
-                transactionClient.updateTransactionDetails(accountMapper.toTransactionUpdateDetailsDTO(updateDTO));
+                case DEBIT -> {
+                    account.setBalance(account.getBalance().subtract(event.getAmount()));
+                    System.out.println("Account: " + event.getAccountId() + " balance has been changed due to transaction:" + event.getTransactionId() + " with an amount of:" + event.getAmount() + " " + event.getTransactionType());
+
+                }
+                case REVERSAL -> {
+                    if (event.getTransactionType() == TransactionType.DEBIT) {
+                        account.setBalance(account.getBalance().add(event.getAmount()));
+                        System.out.println("Account: " + event.getAccountId() + " balance has been changed due to flagged transaction:" + event.getTransactionId() + " with an amount of:" + event.getAmount() + " " + TransactionType.CREDIT);
+
+                    } else if (event.getTransactionType() == TransactionType.CREDIT) {
+                        account.setBalance(account.getBalance().subtract(event.getAmount()));
+                        System.out.println("Account: " + event.getAccountId() + " balance has been changed due to flagged transaction:" + event.getTransactionId() + " with an amount of:" + event.getAmount() + " " + TransactionType.DEBIT);
+                    }
+                    TransactionDetailsUpdateDTO updateDTO = new TransactionDetailsUpdateDTO();
+                    updateDTO.setTransactionId(UUID.fromString(event.getTransactionId()));
+                    updateDTO.setTransactionStatus(TransactionStatus.valueOf("REVERSED"));
+                    transactionClient.updateTransactionDetails(accountMapper.toTransactionUpdateDetailsDTO(updateDTO));
+                }
+                default ->
+                        throw new IllegalArgumentException("Unsupported transaction type: " + event.getTransactionType());
             }
-            default ->
-                    throw new IllegalArgumentException("Unsupported transaction type: " + event.getTransactionType());
+            accountRepository.save(account);
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
+            System.out.println("Error updating balance" + e.getMessage());
         }
-        accountRepository.save(account);
     }
 }

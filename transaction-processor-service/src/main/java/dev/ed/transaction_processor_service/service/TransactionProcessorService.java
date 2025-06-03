@@ -32,27 +32,30 @@ public class TransactionProcessorService {
     @KafkaListener(topics = "${app.kafka.topic.transaction-service}", groupId = "transaction-processor")
     public void handleInitiatedEvent(TransactionInitiatedEvent event) {
 
-        System.out.println("Received" + "\n" +
-                "Transaction: " + event.getTransactionId() +
-                "from Account: " + event.getAccountId() +
-                "at: " + Instant.now());
+        try {
+            System.out.println("Received" + "\n" +
+                    "Transaction: " + event.getTransactionId() +
+                    "from Account: " + event.getAccountId() +
+                    "at: " + Instant.now());
 
-        String accountID = event.getAccountId();
-        AccountDetailsResponseDTO accountDetailsResponseDTO = accountClient.getAccountDetails(UUID.fromString(accountID))
-                .orElseThrow(() -> new NoSuchElementException("Account not found with ID: " + accountID));
-        ;
+            String accountID = event.getAccountId();
+            AccountDetailsResponseDTO accountDetailsResponseDTO = accountClient.getAccountDetails(UUID.fromString(accountID))
+                    .orElseThrow(() -> new NoSuchElementException("Account not found with ID: " + accountID));
 
-        TransactionStatus newTransactionStatus = TransactionStatus.PENDING;
+            TransactionStatus newTransactionStatus = TransactionStatus.PENDING;
 
-        if (event.getTransactionType().equals(TransactionType.DEBIT)) {
-            if (accountDetailsResponseDTO.getBalance().compareTo(event.getAmount()) < 0) {
-                newTransactionStatus = TransactionStatus.DECLINED;
-            } else {
-                newTransactionStatus = TransactionStatus.APPROVED;
+            if (event.getTransactionType().equals(TransactionType.DEBIT)) {
+                if (accountDetailsResponseDTO.getBalance().compareTo(event.getAmount()) < 0) {
+                    newTransactionStatus = TransactionStatus.DECLINED;
+                } else {
+                    newTransactionStatus = TransactionStatus.APPROVED;
+                }
             }
-        }
 
-        publish(transactionProcessorMapper.toTransactionProcessedEvent(event, newTransactionStatus));
+            publish(transactionProcessorMapper.toTransactionProcessedEvent(event, newTransactionStatus));
+        } catch (NoSuchElementException e) {
+            System.out.println("Error processing transaction" + e.getMessage());
+        }
 
     }
 

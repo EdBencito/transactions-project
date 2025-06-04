@@ -7,7 +7,7 @@ import dev.ed.shared.enums.TransactionStatus;
 import dev.ed.shared.enums.TransactionType;
 import dev.ed.transaction_service.client.AccountClient;
 import dev.ed.transaction_service.model.Transaction;
-import dev.ed.transaction_service.repository.TransactionRepository;
+import dev.ed.transaction_service.service.TransactionService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -15,25 +15,26 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+
 @Transactional
 @Service
 @RequiredArgsConstructor
 public class TransactionGenerator {
 
     private final AccountClient accountClient;
-    private final TransactionRepository transactionRepository;
+    private final TransactionService transactionService;
 
     @SneakyThrows
     public void generateTransactions() {
         Transaction transaction = Transaction.builder()
                 .transactionId(generateUUID())
                 .accountId(accountClient.getRandomAccountId().orElseThrow(() -> new EntityNotFoundException("No Accounts Found")))
-                .transactionStatus(TransactionStatus.getRandomStatus())
+                .transactionStatus(TransactionStatus.PENDING)
                 .creationDateTime(Instant.now().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 .lastUpdated(Instant.now().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 .transactionType(TransactionType.getRandomType())
@@ -43,26 +44,25 @@ public class TransactionGenerator {
                 .transactionChannel(TransactionChannel.getRandomChannel())
                 .isFraudulent(false)
                 .build();
-        transactionRepository.save(transaction);
+        transactionService.createTransaction(transaction);
     }
 
     @SneakyThrows
-    public void injectFraudulentTransaction() {
-
+    public void generateFraudulentTransaction() {
         Transaction transaction = Transaction.builder()
                 .transactionId(generateUUID())
                 .accountId(accountClient.getRandomAccountId().orElseThrow(() -> new EntityNotFoundException("No Accounts Found")))
-                .transactionStatus(TransactionStatus.getRandomStatus())
-                .creationDateTime(LocalDateTime.from(Instant.now()))
-                .lastUpdated(LocalDateTime.from(Instant.now()))
+                .transactionStatus(TransactionStatus.PENDING)
+                .creationDateTime(Instant.now().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                .lastUpdated(Instant.now().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 .transactionType(TransactionType.DEBIT)
-                .amount(generateAmountBasedOnProfile("HIGH_SPENDER"))
+                .amount(generateAmountBasedOnProfile(getRandomProfile()))
                 .currency("GBP")
                 .merchantCategory(MerchantCategory.getRandomFraudulentCategory())
                 .transactionChannel(TransactionChannel.getRandomFraudulentChannel())
                 .isFraudulent(true)
                 .build();
-        transactionRepository.save(transaction);
+        transactionService.createTransaction(transaction);
     }
 
     private UUID generateUUID() {
@@ -76,11 +76,11 @@ public class TransactionGenerator {
 
     private BigDecimal generateAmountBasedOnProfile(String profile) {
         if ("HIGH_SPENDER".equals(profile)) {
-            return BigDecimal.valueOf(100 + ThreadLocalRandom.current().nextDouble() * 500); // Higher amounts
+            return BigDecimal.valueOf(100 + ThreadLocalRandom.current().nextDouble() * 500).setScale(2, RoundingMode.DOWN); // Higher amounts
         } else if ("MEDIUM_SPENDER".equals(profile)) {
-            return BigDecimal.valueOf(50 + ThreadLocalRandom.current().nextDouble() * 100); // Medium amounts
+            return BigDecimal.valueOf(50 + ThreadLocalRandom.current().nextDouble() * 100).setScale(2, RoundingMode.DOWN); // Medium amounts
         } else { // "LOW_SPENDER" or default
-            return BigDecimal.valueOf(10 + ThreadLocalRandom.current().nextDouble() * 10); // Lower amounts
+            return BigDecimal.valueOf(10 + ThreadLocalRandom.current().nextDouble() * 10).setScale(2, RoundingMode.DOWN); // Lower amounts
         }
     }
 

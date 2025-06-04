@@ -25,7 +25,7 @@ public enum MerchantCategory {
 
     public static MerchantCategory getRandomFraudulentCategory() {
         MerchantCategory[] values = {GAMBLING, ADULT_SERVICES, CRYPTOCURRENCY};
-        return values[ThreadLocalRandom.current().nextInt(values().length)];
+        return values[ThreadLocalRandom.current().nextInt(values.length)];
     }
 
 }

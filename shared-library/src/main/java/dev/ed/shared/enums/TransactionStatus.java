@@ -13,6 +13,6 @@ public enum TransactionStatus {
 
     public static TransactionStatus getRandomStatus() {
         TransactionStatus[] values = {PENDING, APPROVED, DECLINED, REVERSED, CANCELLED};
-        return values[ThreadLocalRandom.current().nextInt(values().length)];
+        return values[ThreadLocalRandom.current().nextInt(values.length)];
     }
 }

@@ -18,7 +18,7 @@ public class FraudDetectionMapper {
                 .setAccountId(transactionInitiatedEvent.getAccountId())
                 .setTransactionStatus(mapToAvroTransactionStatus(transactionStatus))
                 .setAmount(transactionInitiatedEvent.getAmount())
-                .setFlaggedAt(toEpochMilliseconds(LocalDateTime.from(Instant.now())))
+                .setFlaggedAt(toEpochMilliseconds(LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault())))
                 .setIsFlagged(transactionInitiatedEvent.getIsFlagged())
                 .build();
     }

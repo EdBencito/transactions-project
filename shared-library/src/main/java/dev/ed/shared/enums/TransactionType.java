@@ -5,10 +5,10 @@ import java.util.concurrent.ThreadLocalRandom;
 public enum TransactionType {
     DEBIT,
     CREDIT,
-    REVERSAl;
+    REVERSAL;
 
     public static TransactionType getRandomType() {
-        TransactionType[] values = TransactionType.values();
-        return values[ThreadLocalRandom.current().nextInt(values().length)];
+        TransactionType[] values = {DEBIT, CREDIT};
+        return values[ThreadLocalRandom.current().nextInt(values.length)];
     }
 }

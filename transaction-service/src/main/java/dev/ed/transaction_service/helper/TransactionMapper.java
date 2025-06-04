@@ -121,7 +121,7 @@ public class TransactionMapper {
         return TransactionStatus.valueOf(status.name());
     }
 
-    private dev.ed.avro.TransactionType mapToAvroTransactionType(TransactionType transactionType) {
+    public dev.ed.avro.TransactionType mapToAvroTransactionType(TransactionType transactionType) {
         return dev.ed.avro.TransactionType.valueOf(transactionType.name());
     }
 }

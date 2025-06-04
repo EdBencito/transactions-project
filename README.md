@@ -160,9 +160,6 @@ This project is a work in progress with several improvements under consideration
 * **Centralized Logging**
     * Consider ELK stack (Elasticsearch, Logstash, Kibana) or Grafana Loki for unified log storage and search.
 
-* **Improve Kafka Usage**
-    * Improved Kafka logic, what happens when transaction.flagged is consumed before transaction.processed?
-
 ---
 
 > This project serves as a foundation for learning distributed system design, event-driven architecture, and real-world

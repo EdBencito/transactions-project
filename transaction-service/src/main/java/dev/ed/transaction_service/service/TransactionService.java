@@ -6,6 +6,7 @@ import dev.ed.avro.TransactionInitiatedEvent;
 import dev.ed.avro.TransactionProcessedEvent;
 import dev.ed.shared.DTOs.TransactionDetailsUpdateDTO;
 import dev.ed.shared.enums.TransactionStatus;
+import dev.ed.shared.enums.TransactionType;
 import dev.ed.transaction_service.helper.TransactionMapper;
 import dev.ed.transaction_service.model.Transaction;
 import dev.ed.transaction_service.repository.TransactionRepository;
@@ -55,6 +56,7 @@ public class TransactionService {
     public Transaction updateTransactionDetails(UUID transactionId, TransactionDetailsUpdateDTO newDetails) {
         Transaction transaction = getTransaction(transactionId);
         transaction.setTransactionStatus(newDetails.getTransactionStatus() != null ? newDetails.getTransactionStatus() : transaction.getTransactionStatus());
+        transaction.setTransactionType(newDetails.getTransactionType() != null ? newDetails.getTransactionType() : transaction.getTransactionType());
         transaction.setLastUpdated(LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()));
         return transactionRepository.save(transaction);
     }
@@ -93,6 +95,7 @@ public class TransactionService {
 
     @KafkaListener(topics = "${app.kafka.topic.fraud-detection-service}", groupId = "transaction-service", containerFactory = "transactionFlaggedEventConcurrentKafkaListenerContainerFactory")
     public void handleFlaggedEvent(TransactionFlaggedEvent event) {
+
         try {
             Transaction transaction = getTransaction(UUID.fromString(event.getTransactionId()));
             UUID transactionId = transaction.getTransactionId();
@@ -100,8 +103,12 @@ public class TransactionService {
             if (transaction.getTransactionStatus() != TransactionStatus.FLAGGED) {
                 TransactionDetailsUpdateDTO flaggedDetails = new TransactionDetailsUpdateDTO();
                 flaggedDetails.setTransactionId(transactionId);
+                flaggedDetails.setOriginalTransactionType(transaction.getTransactionType());
+                flaggedDetails.setTransactionType(TransactionType.REVERSAL);
                 flaggedDetails.setTransactionStatus(TransactionStatus.FLAGGED);
-                updateTransactionDetails(transactionId, flaggedDetails);
+                BalanceUpdateEvent balanceUpdateEvent = transactionMapper.toBalanceUpdateEvent(updateTransactionDetails(transactionId, flaggedDetails), event);
+                balanceUpdateEvent.setOriginalTransactionType(transactionMapper.mapToAvroTransactionType(flaggedDetails.getOriginalTransactionType()));
+                publish(balanceUpdateEvent);
             }
 
             if (transaction.getTransactionStatus().equals(TransactionStatus.APPROVED)) {

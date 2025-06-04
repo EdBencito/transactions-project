@@ -22,6 +22,11 @@
         "symbols": ["DEBIT", "CREDIT", "REVERSAL"]
       }
     },
+    {
+      "name": "originalTransactionType",
+      "type": ["null", "dev.ed.avro.TransactionType"],
+      "default": null
+    },
     { "name": "currency", "type": "string" },
     {
       "name": "lastUpdated",

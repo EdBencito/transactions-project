@@ -3,6 +3,104 @@
 A microservices system simulating a financial transaction platform using Apache Kafka, Avro, Docker, and
 Spring Boot. This architecture showcases modern patterns such as asynchronous messaging, schema-based communication, and
 service decoupling.
+---
+
+# Getting Started
+
+## Prerequisites
+
+*   Java 17
+*   Docker + Docker Compose
+*   PostgreSQL running locally (DB setup described below)
+
+## Step 1: Start Kafka + Infrastructure + PostgreSQL
+
+```bash
+docker-compose up -d
+```
+
+This brings up:
+
+* Kafka + Zookeeper
+
+*  Confluent Schema Registry
+
+* Kafdrop (Kafka web UI) at http://localhost:9000
+
+```bash
+docker run --name postgres \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=transactions_project_db \
+  -p 5432:5432 \
+  -d postgres:16
+```
+
+This starts a fresh Postgres container with:
+
+* User: postgres
+* Password: postgres
+* Database: transactions_project_db
+* Port: 5432 on localhost
+
+You can customize these values in the -e environment variables.
+
+### Apply Schema SQL
+
+Once the container is running, apply your SQL schema(s). From your host:
+```bash
+docker exec -i postgres psql -U postgres -d transactions_project_db < db/schema/account_service_schema.sql
+docker exec -i postgres psql -U postgres -d transactions_project_db < db/schema/transaction_service_schema.sql
+```
+
+Or, using psql directly (if installed locally):
+
+```bash
+psql -h localhost -U postgres -d transactions_project_db -f db/schema/account_service_schema.sql
+psql -h localhost -U postgres -d transactions_project_db -f db/schema/transaction_service_schema.sql
+```
+## Step 2: Run Services
+
+In separate terminal tabs, navigate to each account-service & transaction-service and run:
+
+```bash
+DATASOURCE_URL=jdbc:postgresql://localhost:{PORT}/{YOUR_DB} \
+DATASOURCE_USERNAME={YOUR_USERNAME} \
+DATASOURCE_PASSWORD={YOUR_PASSWORD} \
+./gradlew bootRun
+```
+
+&nbsp; Example:
+
+```bash
+cd account-service
+DATASOURCE_URL=jdbc:postgresql://localhost:{PORT}/{YOUR_DB} \
+DATASOURCE_USERNAME={YOUR_USERNAME} \
+DATASOURCE_PASSWORD={YOUR_PASSWORD} \
+./gradlew bootRun
+```
+and run these for transaction-processor-service & fraud-detection-service and run:
+
+```bash
+./gradlew bootRun
+```
+
+&nbsp; Example:
+
+```bash
+cd account-service
+./gradlew bootRun
+```
+
+## Step 3: Access Swagger Docs (account-service & transaction-service)
+
+Each service exposes its API docs via Swagger:
+
+```bash
+http://localhost:{PORT}/swagger-ui/index.html
+```
+
+(Adjust {PORT} for each service)
 
 ---
 

@@ -37,11 +37,12 @@ public class FraudDetectionService {
                 System.out.println("Transaction [{}] not flagged. Skipping fraud action. " + event.getTransactionId());
             }
         } catch (Exception e) {
-            System.out.println("Error flagging transaction" + e.getMessage());
+            System.out.println("Error flagging transaction " + e.getMessage());
         }
     }
 
-    private void flagTransaction(TransactionInitiatedEvent event) {
+    private void flagTransaction(TransactionInitiatedEvent event) throws InterruptedException {
+        Thread.sleep(2000);
         TransactionStatus newTransactionStatus = TransactionStatus.FLAGGED;
         publish(fraudDetectionMapper.toTransactionFlaggedEvent(event, newTransactionStatus));
 

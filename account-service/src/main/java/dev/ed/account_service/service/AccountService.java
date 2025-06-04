@@ -71,16 +71,16 @@ public class AccountService {
             switch (event.getTransactionType()) {
                 case CREDIT -> {
                     account.setBalance(account.getBalance().add(event.getAmount()));
-                    System.out.println("Account: " + event.getAccountId() + " balance has been changed due to transaction:" + event.getTransactionId() + " with an amount of:" + event.getAmount() + " " + event.getTransactionType());
+                    System.out.println("Account: " + event.getAccountId() + " balance has been changed due to transaction: " + event.getTransactionId() + " with an amount of:" + event.getAmount() + " " + event.getTransactionType());
 
                 }
                 case DEBIT -> {
                     account.setBalance(account.getBalance().subtract(event.getAmount()));
-                    System.out.println("Account: " + event.getAccountId() + " balance has been changed due to transaction:" + event.getTransactionId() + " with an amount of:" + event.getAmount() + " " + event.getTransactionType());
+                    System.out.println("Account: " + event.getAccountId() + " balance has been changed due to transaction: " + event.getTransactionId() + " with an amount of:" + event.getAmount() + " " + event.getTransactionType());
 
                 }
                 case REVERSAL -> {
-                    if (event.getTransactionType() == TransactionType.DEBIT) {
+                    if (event.getOriginalTransactionType() == TransactionType.DEBIT) {
                         account.setBalance(account.getBalance().add(event.getAmount()));
                         System.out.println("Account: " + event.getAccountId() + " balance has been changed due to flagged transaction:" + event.getTransactionId() + " with an amount of:" + event.getAmount() + " " + TransactionType.CREDIT);
 
@@ -92,6 +92,7 @@ public class AccountService {
                     updateDTO.setTransactionId(UUID.fromString(event.getTransactionId()));
                     updateDTO.setTransactionStatus(TransactionStatus.valueOf("REVERSED"));
                     transactionClient.updateTransactionDetails(accountMapper.toTransactionUpdateDetailsDTO(updateDTO));
+                    //TODO: for some reason TransactionDetails is not updated
                 }
                 default ->
                         throw new IllegalArgumentException("Unsupported transaction type: " + event.getTransactionType());

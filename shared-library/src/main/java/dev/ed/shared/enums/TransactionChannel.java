@@ -17,6 +17,6 @@ public enum TransactionChannel {
 
     public static TransactionChannel getRandomFraudulentChannel() {
         TransactionChannel[] values = {MOBILE_APP, WEB};
-        return values[ThreadLocalRandom.current().nextInt(values().length)];
+        return values[ThreadLocalRandom.current().nextInt(values.length)];
     }
 }

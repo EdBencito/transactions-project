@@ -35,7 +35,7 @@ public class TransactionController {
         return new ResponseEntity<>(transactionMapper.toResponseDTO(transaction), HttpStatus.OK);
     }
 
-    @PatchMapping("/{transactionId}/transactionDetails")
+    @PutMapping("/transactionDetails")
     public ResponseEntity<TransactionDetailsResponseDTO> updateTransactionDetails(@RequestBody TransactionDetailsUpdateDTO detailsUpdateRequest) {
         Transaction updatedTransaction = transactionService.updateTransactionDetails(detailsUpdateRequest.getTransactionId(), detailsUpdateRequest);
         return new ResponseEntity<>(transactionMapper.toResponseDTO(updatedTransaction), HttpStatus.OK);

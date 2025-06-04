@@ -50,6 +50,8 @@ public class TransactionProcessorService {
                 } else {
                     newTransactionStatus = TransactionStatus.APPROVED;
                 }
+            } else if (event.getTransactionType().equals(TransactionType.CREDIT)) {
+                newTransactionStatus = TransactionStatus.APPROVED;
             }
 
             publish(transactionProcessorMapper.toTransactionProcessedEvent(event, newTransactionStatus));

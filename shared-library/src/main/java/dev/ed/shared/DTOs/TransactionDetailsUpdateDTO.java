@@ -1,6 +1,7 @@
 package dev.ed.shared.DTOs;
 
 import dev.ed.shared.enums.TransactionStatus;
+import dev.ed.shared.enums.TransactionType;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
@@ -21,5 +22,11 @@ public class TransactionDetailsUpdateDTO {
     private UUID transactionId;
     @NotNull(message = "transactionStatus is required")
     @Enumerated(EnumType.STRING)
-    private TransactionStatus transactionStatus;;
+    private TransactionStatus transactionStatus;
+    @NotNull(message = "originalTransactionType is required")
+    @Enumerated(EnumType.STRING)
+    private TransactionType originalTransactionType;
+    @NotNull(message = "transactionType is required")
+    @Enumerated(EnumType.STRING)
+    private TransactionType transactionType;
 }
